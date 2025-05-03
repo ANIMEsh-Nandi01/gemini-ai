@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant By ANIMESH</title>
+    <!-- Include Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Dark gradient background with glow */
+        body {
+            background: #2b063c;
+            min-height: 100vh;
+        }
+        
+        /* Glow effects */
+        .glow-effect {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.15;
+            z-index: 0;
+        }
+        
+        .glow-purple {
+            background: #8b5cf6;
+            top: 10%;
+            right: 15%;
+        }
+        
+        .glow-blue {
+            background: #3b82f6;
+            bottom: 10%;
+            left: 15%;
+        }
+        
+        .glow-pink {
+            background: #ec4899;
+            top: 40%;
+            left: 10%;
+        }
+        
+        /* Improved glassmorphism */
+        .glass {
+            background: rgba(37, 11, 77, 0.8);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Chat container */
+        .chat-container {
+            background: #131b2e;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+        }
+        
+        /* Enhanced glow effects */
+        .glow {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+        
+        .glow-blue {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
+        }
+        
+        /* New improved typing animation */
+        .typing-dots span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 3px;
+            background: #fff;
+            animation: typingDots 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typingDots {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+            30% { transform: translateY(-5px); opacity: 1; }
+        }
+        
+        /* Thinking animation */
+        .thinking-animation {
+            position: relative;
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            vertical-align: middle;
+        }
+        
+        .thinking-animation:before {
+            content: '';
+            box-sizing: border-box;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 24px;
+            height: 24px;
+            margin-top: -12px;
+            margin-left: -12px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: #fff;
+            animation: thinking-spinner 0.8s linear infinite;
+        }
+        
+        @keyframes thinking-spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Message appear animation */
+        .message-appear {
+            animation: fadeIn 0.4s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Custom scrollbar */
+        #chatbox::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        #chatbox::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 10px;
+        }
+        
+        #chatbox::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+        
+        #chatbox::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Button hover effect */
+        .btn-hover-effect {
+            transition: all 0.3s ease;
+        }
+        
+        .btn-hover-effect:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Pulse animation for send button */
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(139, 92, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(139, 92, 246, 0);
+            }
+        }
+        
+        /* Text typing animation */
+        .text-typing {
+            overflow: hidden;
+            border-right: 2px solid white;
+            white-space: nowrap;
+            margin: 0 auto;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+        
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: white }
+        }
+        
+        /* User message style */
+        .user-message {
+            background: rgba(59, 130, 246, 0.15);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            align-self: flex-end;
+            max-width: 80%;
+            border-right: 3px solid rgba(59, 130, 246, 0.5);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Bot message style */
+        .bot-message {
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            align-self: flex-start;
+            max-width: 80%;
+            border-left: 3px solid rgba(139, 92, 246, 0.5);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Add styles for formatted content in bot messages */
+        .bot-message ul, .bot-message ol {
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .bot-message ul li {
+            list-style-type: disc;
+            margin-bottom: 0.25rem;
+        }
+        
+        .bot-message ol li {
+            list-style-type: decimal;
+            margin-bottom: 0.25rem;
+        }
+        
+        .bot-message p {
+            margin-bottom: 0.5rem;
+        }
+        
+        .bot-message code {
+            background: rgba(15, 23, 42, 0.3);
+            padding: 0.1rem 0.3rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        
+        .bot-message pre {
+            background: rgba(15, 23, 42, 0.3);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            margin: 0.5rem 0;
+        }
+        
+        /* Send button style */
+        .send-button {
+            background: #6366f1;
+            border-radius: 0 0.75rem 0.75rem 0;
+            padding: 0.75rem 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .send-button:hover {
+            background: #4f46e5;
+        }
+        
+        /* Input field style */
+        .input-field {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem 0 0 0.75rem;
+            padding: 0.75rem 1rem;
+            color: white;
+            width: 100%;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+    </style>
+</head>
+<body class="font-sans flex items-center justify-center p-4">
+    <!-- Glow effects in background -->
+    <div class="glow-effect glow-purple"></div>
+    <div class="glow-effect glow-blue"></div>
+    <div class="glow-effect glow-pink"></div>
+
+    <div class="chat-container shadow-2xl p-6 w-full max-w-2xl flex flex-col h-[85vh] relative overflow-hidden">
+        <!-- Header -->
+        <div class="relative z-10">
+            <h1 class="text-2xl font-bold text-center text-white mb-1 flex items-center justify-center">
+                <span class="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-400">Gemini AI Assistant</span>
+                <i class="fas fa-robot ml-2 text-purple-400 animate-pulse"></i>
+            </h1>
+            <p class="text-sm text-center text-white/70 mb-4">Powered by Google's Gemini AI</p>
+        </div>
+        
+        <!-- Chat Display Area -->
+        <div id="chatbox" class="flex-grow glass rounded-xl p-4 mb-4 overflow-y-auto space-y-3 relative z-10 flex flex-col">
+            <!-- Initial message with animation -->
+            <div class="text-center text-white/80 text-sm p-2 message-appear">
+                <i class="fas fa-magic mr-2 text-purple-300"></i>
+                <span class="text-typing">Ask me anything and I'll help you find answers!</span>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="text-center text-white/90 my-2 hidden relative z-10">
+            <div class="flex items-center justify-center">
+                <div class="thinking-animation mr-2"></div>
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <span class="ml-2 text-white/80">Thinking</span>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="flex items-center pt-2 relative z-10">
+            <div class="relative flex-grow">
+                <input type="text" id="userInput" placeholder="Type your message..." 
+                    class="input-field transition-all duration-300">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none opacity-0 transition-opacity duration-300" id="inputIcon">
+                    <i class="fas fa-comment-dots text-purple-300"></i>
+                </div>
+            </div>
+            <button id="sendButton" class="send-button btn-hover-effect">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center text-white/40 text-xs mt-4 relative z-10">
+            <p>For personal use only</p>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    
+    <script>
+        // Add micro-interactions
+        const userInput = document.getElementById('userInput');
+        const inputIcon = document.getElementById('inputIcon');
+        const sendButton = document.getElementById('sendButton');
+        const loading = document.getElementById('loading');
+        const chatbox = document.getElementById('chatbox');
+        
+        // Focus effect
+        userInput.addEventListener('focus', () => {
+            userInput.classList.add('pl-10');
+            setTimeout(() => {
+                inputIcon.classList.remove('opacity-0');
+            }, 200);
+        });
+        
+        userInput.addEventListener('blur', () => {
+            if (userInput.value === '') {
+                inputIcon.classList.add('opacity-0');
+                setTimeout(() => {
+                    userInput.classList.remove('pl-10');
+                }, 200);
+            }
+        });
+        
+        // Send button effect
+        sendButton.addEventListener('mouseenter', () => {
+            sendButton.classList.add('pulse-animation');
+        });
+        
+        sendButton.addEventListener('mouseleave', () => {
+            sendButton.classList.remove('pulse-animation');
+        });
+        
+        // Input animation
+        userInput.addEventListener('input', () => {
+            if (userInput.value.length > 0) {
+                sendButton.classList.add('glow-purple');
+            } else {
+                sendButton.classList.remove('glow-purple');
+            }
+        });
+        
+        // Override the original script's addLoadingMessage function to use our new loading indicator
+        window.originalAddLoadingMessage = window.addLoadingMessage;
+        window.addLoadingMessage = function() {
+            // Show our custom loading indicator
+            loading.classList.remove('hidden');
+            
+            // Call the original function to maintain compatibility
+            const messageId = window.originalAddLoadingMessage ? window.originalAddLoadingMessage() : null;
+            
+            return messageId;
+        };
+        
+        // Override the updateBotMessage function to hide our loading indicator
+        window.originalUpdateBotMessage = window.updateBotMessage;
+        window.updateBotMessage = function(messageId, content) {
+            // Hide our custom loading indicator
+            loading.classList.add('hidden');
+            
+            // Call the original function
+            if (window.originalUpdateBotMessage) {
+                window.originalUpdateBotMessage(messageId, content);
+            }
+        };
+        
+        // Add typing animation to bot messages
+        const addTypingAnimation = (element, text, speed = 30) => {
+            let i = 0;
+            element.textContent = '';
+            element.classList.add('text-typing');
+            
+            const typeWriter = () => {
+                if (i < text.length) {
+                    element.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, speed);
+                } else {
+                    element.classList.remove('text-typing');
+                }
+            };
+            
+            typeWriter();
+        };
+        
+        // Apply typing animation to initial message
+        const initialMessage = document.querySelector('#chatbox .text-typing');
+        if (initialMessage) {
+            const text = initialMessage.textContent;
+            addTypingAnimation(initialMessage, text);
+        }
+        
+        // Enhance the addMessage function to use our new message styles
+        window.originalAddUserMessage = window.addUserMessage;
+        window.addUserMessage = function(content) {
+            // Create a styled user message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'user-message message-appear';
+            messageDiv.textContent = content;
+            chatbox.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatbox.scrollTop = chatbox.scrollHeight;
+            
+            // Call original function if it exists
+            if (window.originalAddUserMessage) {
+                window.originalAddUserMessage(content);
+            }
+        };
+        
+        // Enhance the addBotMessage function
+        window.originalAddBotMessage = window.addBotMessage;
+        window.addBotMessage = function(content) {
+            // Create a styled bot message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'bot-message message-appear';
+            
+            // Basic markdown-like parsing for better formatting
+            let formattedContent = content
+                // Convert ** to bold
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Convert * to italic
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Convert ` to inline code
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                // Convert bullet points
+                .replace(/^\s*-\s+(.+)$/gm, '<li>$1</li>')
+                // Convert numbered lists
+                .replace(/^\s*(\d+)\.\s+(.+)$/gm, '<li>$2</li>');
+            
+            // Wrap lists
+            formattedContent = formattedContent
+                .replace(/<li>(.+)<\/li>\s*<li>/g, '<li>$1</li><li>')
+                .replace(/(<li>.+<\/li>)+/g, '<ul>$&</ul>');
+            
+            // Convert paragraphs
+            formattedContent = '<p>' + formattedContent.replace(/\n\s*\n/g, '</p><p>') + '</p>';
+            formattedContent = formattedContent.replace(/<p><ul>/g, '<ul>').replace(/<\/ul><\/p>/g, '</ul>');
+            
+            messageDiv.innerHTML = formattedContent;
+            chatbox.appendChild(messageDiv);
+            
+            // Scroll to bottom
+            chatbox.scrollTop = chatbox.scrollHeight;
+            
+            // Call original function if it exists
+            if (window.originalAddBotMessage) {
+                window.originalAddBotMessage(content);
+            }
+            
+            return messageDiv.id;
+        };
+    </script>
+</body>
+</html>
