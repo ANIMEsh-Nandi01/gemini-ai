@@ -1,5 +1,11 @@
-// --- Hardcoded API Key (INSECURE - FOR LOCAL TESTING ONLY) ---
-const API_KEY = "AIzaSyCSFsvhRRVS922-M_KRxvebEYdjDFvSa6Q"; // <-- YOUR KEY HERE
+// --- Load API Key from config.js (NOT in repo) ---
+// config.js should define: window.API_KEY = "YOUR_REAL_API_KEY_HERE";
+// This file must be in .gitignore and not pushed to GitHub
+if (typeof window.API_KEY === 'undefined' || !window.API_KEY) {
+    alert('API key not found. Please create config.js with your API key.');
+    throw new Error('API key not found. Please create config.js with your API key.');
+}
+const API_KEY = window.API_KEY;
 // --------------------------------------------------------------
 
 // Check if the API_KEY is placeholder - remind user if it is
